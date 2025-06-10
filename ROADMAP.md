@@ -10,7 +10,7 @@ Entwicklung einer funktionsfähigen Python-Desktop-Anwendung für Lagerverwaltun
 ### **WOCHE 1: FOUNDATION & CORE (Tag 1-7)**
 
 #### **Tag 1-2: Projekt-Setup & Architektur**
-- [ ] **Projektstruktur erstellen**
+- [X] **Projektstruktur erstellen**
   - Ordnerstruktur nach MVC-Pattern anlegen
   - `requirements.txt` mit Abhängigkeiten
   - Git Repository initialisieren

@@ -66,7 +66,30 @@ simply_store/
 │   └── icons/
 ├── main.py
 └── requirements.txt
+
+### Typischer Inhalt einer `requirements.txt`:
 ```
+tkinter
+pillow
+```
+Um alle Pakete aus der `requirements.txt` zu installieren, verwende:
+
+```bash
+pip install -r requirements.txt
+```
+Mit dem Befehl
+
+```bash
+pip freeze > requirements.txt
+```
+
+werden alle aktuell installierten Pakete und deren Versionen in die `requirements.txt` geschrieben. So kann die Umgebung exakt reproduziert werden.
+
+- **`requirements.txt`** = Liste aller benötigten Python-Pakete
+- **Installation:** `pip install -r requirements.txt`
+- **Aktualisieren:** `pip freeze > requirements.txt`
+
+
 
 ---
 
