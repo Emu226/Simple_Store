@@ -16,7 +16,7 @@ Entwicklung einer funktionsfähigen Python-Desktop-Anwendung für Lagerverwaltun
   - Git Repository initialisieren
   - Virtuelle Umgebung einrichten
 
-- [ ] **Database Foundation**
+- [X] **Database Foundation**
   - SQLite Schema definieren (Artikel, Storage, Actions)
   - `models/database.py` - Datenbankverbindung
   - Basis-Tabellen erstellen

@@ -1,4 +1,9 @@
 import sqlite3
+from venv import create
+from datetime import datetime
+from services.data_service import get_database_connection # Importieren der Datenbankverbindung "conn"
+from models import article
+from models import storage
 
 def get_database_connection():
     # Verbindung zur Datenbank herstellen
@@ -41,45 +46,13 @@ def create_articles_table():
                        "Price" TEXT NOT NULL,
                        "Quantity" INTEGER NOT NULL,
                        "Category" TEXT NOT NULL,
-                       "Storage_where" INTEGER NOT NULL,
+                       "Storage_where" TEXT NOT NULL,
                        "LastModified" TEXT NOT NULL,
                        --Fremdschlüssel-Beziehung: Verknüpft Artikel mit ihrem Lagerort. 
                        --Wenn ein Lagerort gelöscht wird, werden alle zugehörigen Artikel automatisch gelöscht (CASCADE)
-                       CONSTRAINT "FK_Articles_Storages_Storage_where" FOREIGN KEY ("Storage_where") REFERENCES "Storages" ("Id") ON DELETE CASCADE
+                       CONSTRAINT "FK_Articles_Storages_Storage_where" FOREIGN KEY ("Storage_where") REFERENCES "Storages" ("Code") ON DELETE CASCADE
                         )
         ''')
-        conn.commit()
-    finally:
-        # Verbindung immer schließen
-        conn.close()
-
-
-def add_storage(code, name, description, last_modified):
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # Lagerort in die Tabelle einfügen
-        cursor.execute('''
-            INSERT INTO Storages (Code, Name, Description, LastModified)
-            VALUES (?, ?, ?, ?)
-        ''', (code, name, description, last_modified))
-        conn.commit()
-    finally:
-        # Verbindung immer schließen
-        conn.close()
-
-
-def add_article(code, name, description, price, quantity, category, storage_where, last_modified):
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    
-    try:
-        # Artikel in die Tabelle einfügen
-        cursor.execute('''
-            INSERT INTO Articles (Code, Name, Description, Price, Quantity, Category, Storage_where, LastModified)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (code, name, description, price, quantity, category, storage_where, last_modified))
         conn.commit()
     finally:
         # Verbindung immer schließen
@@ -101,12 +74,10 @@ def get_all_articles():
 
 create_storages_table()
 create_articles_table()
-# Demo data insert:
-add_storage("ST001", "Lager 1", "Hauptlager für Artikel", "2023-10-01 12:00:00")
-add_storage("ST002", "Lager 2", "Zweites Lager für spezielle Artikel", "2023-10-01 12:00:00")
-add_article("AR001", "Artikel 1", "Beschreibung von Artikel 1", "19.99", 100, "Kategorie A", 1, "2023-10-01 12:00:00")
-add_article("AR002", "Artikel 2", "Beschreibung von Artikel 2", "29.99", 50, "Kategorie B", 2, "2023-10-01 12:00:00")
 
+# Beispiel-Storage und Article erstellen
+storage.Storage.create(storage.Storage("ST001", "Lager 1", "Hauptlager", datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+article.Article.create(article.Article("AR001", "Artikel 1", "Beschreibung Artikel 1", "19.99", 100, "Kategorie A", 1, datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 
 # Beispielaufruf
 if __name__ == "__main__":
