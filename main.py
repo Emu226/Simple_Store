@@ -1,8 +1,9 @@
-import tkinter as tk
+﻿import tkinter as tk
 from tkinter import ttk, messagebox
 import models.database as database
 from datetime import datetime
-import models.article as article
+from models.article import Article
+from models.storage import Storage
 
 class ArticleListWindow:
     def __init__(self, root):
@@ -10,7 +11,7 @@ class ArticleListWindow:
         self.root.title("Simply Store - Artikel Liste")
         self.root.geometry("800x600")
         
-        # Erstelle Treeview f�r Artikel-Liste
+        # Erstelle Treeview für Artikel-Liste
         self.tree = ttk.Treeview(root, columns=("Code", "Name", "Description", "Price", "Quantity", "Category", "Storage", "Created"), show="headings")
         
         # Definiere Spalten
@@ -50,7 +51,7 @@ class ArticleListWindow:
     
     def refresh_data(self):
         try:
-            # L�sche bestehende Eintr�ge
+            # Lösche bestehende Einträge
             for item in self.tree.get_children():
                 self.tree.delete(item)
             
@@ -139,9 +140,60 @@ class ArticleListWindow:
         
         ttk.Button(button_frame, text="Speichern", command=save_article).pack(side="left", padx=5)
         ttk.Button(button_frame, text="Abbrechen", command=dialog.destroy).pack(side="left", padx=5)
+def run_simple_tests():
+    """Führt einfache Tests für Article und Storage CRUD-Operationen durch."""
+    print("\n=== Starte Simple Store Tests ===")
+    
+    try:
+        # Test 1: Storage erstellen und abrufen
+        print("\n--- Storage Tests ---")
+        test_storage = Storage(
+            code="L001",
+            name="Test Lager",
+            description="Ein Test-Lagerort",
+            last_modified=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
+        Storage.create(test_storage)
+        print("✓ Storage erstellt")
+        
+        # Test 2: Article mit Referenz zum Storage erstellen
+        print("\n--- Article Tests ---")
+        test_article = Article(
+            code="A001",
+            name="Test Artikel",
+            description="Ein Test-Artikel",
+            price=9.99,
+            quantity=10,
+            category="Test",
+            storage_where="L001",
+            last_modified=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
+        Article.create(test_article)
+        print("✓ Article erstellt")
+        
+        # Test 3: Alle Artikel auflisten
+        print("\nAlle Artikel:")
+        for article in Article.get_all():
+            print(f"- {article.code}: {article.name} (Lager: {article.storage_where})")
+        
+        # Test 4: Alle Lagerorte auflisten
+        print("\nAlle Lagerorte:")
+        for storage in Storage.get_all():
+            print(f"- {storage.code}: {storage.name}")
+            
+    except Exception as e:
+        print(f"\n❌ Fehler während der Tests: {str(e)}")
+    
+    print("\n=== Tests abgeschlossen ===")
 
 # Main
 if __name__ == "__main__":
+    # Füge einen Button für Tests zum bestehenden GUI hinzu
     root = tk.Tk()
     app = ArticleListWindow(root)
+    
+    # Test-Button im button_frame hinzufügen
+    ttk.Button(app.tree, text="Tests ausführen", 
+              command=run_simple_tests).pack(side="bottom", pady=5)
+    
     root.mainloop()
