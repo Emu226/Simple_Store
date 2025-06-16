@@ -19,6 +19,10 @@ class MainWindow:
         
         # Style configuration
         self.configure_styles()
+        
+        # Initialize controller
+        from controllers.article_list_controller import ArticleListController
+        self.article_list_controller = ArticleListController()
 
     def configure_styles(self):
         style = ttk.Style()
@@ -108,11 +112,86 @@ class MainWindow:
         if result:
             # Handle the result
             if result["type"] == "article":
-                print(f"Processing article: {result['code']}")
-                # TODO: Open article context window
+                from views.article_dialog import ArticleDialog
+                from models.article import Article
+                import datetime
+                
+                def create_article(data):
+                    try:
+                        # Erstelle neues Article-Objekt
+                        article = Article(
+                            code=data['code'],
+                            name=data['name'],
+                            description=data.get('desc', ''),
+                            price=float(data.get('price', 0)),
+                            quantity=int(data.get('quantity', 0)),
+                            category=data.get('category', ''),
+                            storage_where=data.get('storage', None),
+                            last_modified=datetime.datetime.now()
+                        )
+                        # Speichere in Datenbank
+                        Article.create(article)
+                        return True
+                    except Exception as e:
+                        print(f"Fehler beim Erstellen des Artikels: {e}")
+                        return False
+
+                # Öffne Article Dialog
+                dialog = ArticleDialog(self.root, create_article)
+                # Setze den gescannten Code
+                dialog.fields['code'].insert(0, result['code'])
+                # Mache Code-Feld schreibgeschützt
+                dialog.fields['code'].configure(state='readonly')
+                
+                # Warte bis der Dialog geschlossen wird
+                self.root.wait_window(dialog.dialog)
+                
+                # Wenn der Artikel erfolgreich erstellt wurde, öffne die Artikel-Liste
+                if dialog.dialog.winfo_exists() == 0:  # Dialog wurde geschlossen
+                    self.open_article_list()
+                
             else:  # storage
-                print(f"Processing storage location: {result['code']}")
-                # TODO: Open storage management window
+                from views.storage_dialog import StorageDialog
+                from models.storage import Storage
+                import datetime
+                
+                def create_storage(data):
+                    try:
+                        # Erstelle neues Storage-Objekt
+                        storage = Storage(
+                            code=data['code'],
+                            name=data['name'],
+                            description=data.get('desc', ''),
+                            last_modified=datetime.datetime.now()
+                        )
+                        # Speichere in Datenbank
+                        Storage.create(storage)
+                        return True
+                    except Exception as e:
+                        print(f"Fehler beim Erstellen des Lagerorts: {e}")
+                        return False
+
+                # Öffne Storage Dialog
+                dialog = StorageDialog(self.root, create_storage)
+                # Setze den gescannten Code
+                dialog.fields['code'].insert(0, result['code'])
+                # Mache Code-Feld schreibgeschützt
+                dialog.fields['code'].configure(state='readonly')
+                
+                # Warte bis der Dialog geschlossen wird
+                self.root.wait_window(dialog.dialog)
+                
+                # Wenn der Lagerort erfolgreich erstellt wurde, öffne die Artikel-Liste
+                if dialog.dialog.winfo_exists() == 0:  # Dialog wurde geschlossen
+                    self.open_article_list()
+
+    def open_article_list(self):
+        """Öffnet das ArticleListWindow in einem neuen Fenster"""
+        list_window = tk.Toplevel(self.root)
+        from views.article_list_window import ArticleListWindow
+        article_list_window = ArticleListWindow(list_window, self.article_list_controller)
+        # Wichtig: Setze zuerst die View im Controller
+        self.article_list_controller.set_view(article_list_window)
 
     def show_articles(self):
         print("Showing articles...")

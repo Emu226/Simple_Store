@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simply Store - Datenfluss</title>
+
+    <!-- Mermaid JS einbinden -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .legend {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simply Store - Datenfluss Visualisierung</h1>
+
+    <!-- Mermaid Diagramm -->
+    <div class="mermaid">
+        graph TD
+        subgraph Main Application
+        MW[MainWindow] -->|1. Start| SE[Scan Entry]
+        SE -->|2. Enter/Button| SW[ScanWindow]
+        end
+
+        subgraph Article Workflow
+        SW -->|3a. Article Code| ALC[ArticleListController]
+        ALC -->|4. Show| AD[ArticleDialog]
+        AD -->|5. Form Data| ALC
+        ALC -->|6. Create| AM[Article Model]
+        AM -->|7. CRUD| DB[(SQLite DB)]
+        end
+
+        subgraph Storage Workflow
+        SW -->|3b. Storage Code| SM[Storage Model]
+        SM -->|Storage CRUD| DB
+        end
+
+        subgraph Data Flow Back
+        DB -->|8. Load| AM
+        AM -->|9. Update| ALC
+        ALC -->|10. Refresh| VIEW[Article View]
+        end
+
+        style MW fill:#f9f,stroke:#333,stroke-width:2px
+        style DB fill:#ddf,stroke:#333,stroke-width:2px
+        style AM fill:#dfd,stroke:#333,stroke-width:2px
+        style ALC fill:#ffd,stroke:#333,stroke-width:2px
+    </div>
+
+    <!-- Legende -->
+    <div class="legend">
+        <h2>Legende</h2>
+        <ul>
+            <li><strong>MainWindow (MW)</strong> - Hauptfenster der Anwendung</li>
+            <li><strong>ScanWindow (SW)</strong> - Fenster für Artikel/Lager-Scan</li>
+            <li><strong>ArticleListController (ALC)</strong> - Steuert Artikel-Operationen</li>
+            <li><strong>ArticleDialog (AD)</strong> - Formular für Artikel-Details</li>
+            <li><strong>Article Model (AM)</strong> - Datenmodell & Datenbankzugriff</li>
+            <li><strong>Storage Model (SM)</strong> - Verwaltung der Lagerorte</li>
+            <li><strong>Database (DB)</strong> - SQLite Datenbank</li>
+        </ul>
+
+        <h3>Ablauf</h3>
+        <ol>
+            <li>Start: MainWindow öffnet sich</li>
+            <li>Benutzer gibt Code ein und drückt Enter/Button</li>
+            <li>Code wird als Artikel oder Lagerort identifiziert</li>
+            <li>Bei Artikel: Dialog zur Bearbeitung öffnet sich</li>
+            <li>Formulardaten werden gesammelt</li>
+            <li>Article Model erstellt neuen Artikel</li>
+            <li>Datenbank-Operationen (CRUD)</li>
+            <li>Daten werden aus DB geladen</li>
+            <li>Controller erhält aktualisierte Daten</li>
+            <li>View wird mit neuen Daten aktualisiert</li>
+        </ol>
+    </div>
+</body>
+</html>
